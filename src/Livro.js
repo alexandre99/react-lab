@@ -1,12 +1,47 @@
 import React, { Component } from 'react';
+import InputCustomizado from './componentes/InputCustomizado';
+import ButtonCustomizado from './componentes/ButtonCustomizado';
 
-
-export default class TabelaLivro extends Component {
+class FormularioLivro extends Component {
 
     constructor() {
         super();
-        this.state = { lista: [] };
+        this.state = { titulo: '', preco: '', idAutor: '' };
+        this.setTitulo = this.setTitulo.bind(this);
+        this.setPreco = this.setPreco.bind(this);
+        this.setIdAutor = this.setIdAutor.bind(this);
     }
+
+    setTitulo(evento) {
+        this.setState({ titulo: evento.target.value });
+    }
+
+    setPreco(evento) {
+        this.setState({ preco: evento.target.value });
+    }
+
+    setIdAutor(evento) {
+        this.setState({ idAutor: evento.target.value })
+    }
+
+    render() {
+        return (
+            <div className="pure-form pure-form-aligned">
+                <form className="pure-form pure-form-aligned" onSubmit={this.enviaForm} method="post">
+                    <InputCustomizado id="titulo" type="text" name="titulo" value={this.state.titulo} onChange={this.setTitulo} label="Título" />
+                    <InputCustomizado id="preco" type="text" name="preco" value={this.state.preco} onChange={this.setPreco} label="Preço" />
+                    <InputCustomizado id="autor" type="text" name="autor" value={this.state.idAutor} onChange={this.setIdAutor} label="Autor" />
+                    <div className="pure-control-group">
+                        <label></label>
+                        <ButtonCustomizado type="submit" className="pure-button pure-button-primary" name="Gravar" />
+                    </div>
+                </form>
+            </div>
+        );
+    }
+}
+
+class TabelaLivro extends Component {
 
     render() {
         return (
@@ -21,7 +56,7 @@ export default class TabelaLivro extends Component {
                     </thead>
                     <tbody>
                         {
-                            this.state.lista.map(function (livro) {
+                            this.props.lista.map(function (livro) {
                                 return (
                                     <tr key={livro.id}>
                                         <td>{livro.título}</td>
@@ -33,6 +68,28 @@ export default class TabelaLivro extends Component {
                         }
                     </tbody>
                 </table>
+            </div>
+        );
+    }
+}
+
+export default class LivroBox extends Component {
+
+    constructor() {
+        super();
+        this.state = { lista: [] };
+    }
+    
+    render() {
+        return (
+            <div>
+                <div className="header">
+                    <h1>Cadastro de livros</h1>
+                </div>
+                <div className="content" id="content">
+                    <FormularioLivro />
+                    <TabelaLivro lista={this.state.lista} />
+                </div>
             </div>
         );
     }
