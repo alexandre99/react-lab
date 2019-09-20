@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import AutorBox from './Autor';
+import TabelaLivro from './Livro';
 import Home from './Home';
 import * as serviceWorker from './serviceWorker';
 import { Router, Route, browserHistory, IndexRoute } from 'react-router';
@@ -12,7 +13,7 @@ ReactDOM.render(
         <Route path="/" component={App}>
             <IndexRoute component={Home} />
             <Route path="/autor" component={AutorBox} />
-            <Route path="/livro" />
+            <Route path="/livro" component={TabelaLivro} />
         </Route>
     </Router>),
     document.getElementById('root')
