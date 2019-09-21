@@ -1,15 +1,31 @@
 import React, { Component } from 'react';
 import InputCustomizado from './componentes/InputCustomizado';
 import ButtonCustomizado from './componentes/ButtonCustomizado';
+import $ from 'jquery';
+import SelectCustomizado, { SelectItem } from './componentes/SelectCustomizado';
 
 class FormularioLivro extends Component {
 
     constructor() {
         super();
-        this.state = { titulo: '', preco: '', idAutor: '' };
+        this.state = { titulo: '', preco: '', idAutor: '', selectItems: [], selectValue: '' };
         this.setTitulo = this.setTitulo.bind(this);
         this.setPreco = this.setPreco.bind(this);
         this.setIdAutor = this.setIdAutor.bind(this);
+    }
+
+    componentDidMount() {
+        $.ajax({
+            url: 'http://localhost:8080/api/autores',
+            dataType: 'json',
+            type: 'get',
+            success: function (autores) {
+                this.setState({ selectItems: autores.map((autor) => new SelectItem(autor.id, autor.nome, autor.id)) });
+            }.bind(this),
+            error: function (resposta) {
+                console.log(resposta);
+            }
+        });
     }
 
     setTitulo(evento) {
@@ -30,7 +46,7 @@ class FormularioLivro extends Component {
                 <form className="pure-form pure-form-aligned" onSubmit={this.enviaForm} method="post">
                     <InputCustomizado id="titulo" type="text" name="titulo" value={this.state.titulo} onChange={this.setTitulo} label="Título" />
                     <InputCustomizado id="preco" type="text" name="preco" value={this.state.preco} onChange={this.setPreco} label="Preço" />
-                    <InputCustomizado id="autor" type="text" name="autor" value={this.state.idAutor} onChange={this.setIdAutor} label="Autor" />
+                    <SelectCustomizado value={this.state.value} name="autor" onChange={this.setIdAutor} label="autor" selectItems={this.state.selectItems} />
                     <div className="pure-control-group">
                         <label></label>
                         <ButtonCustomizado type="submit" className="pure-button pure-button-primary" name="Gravar" />
@@ -79,7 +95,7 @@ export default class LivroBox extends Component {
         super();
         this.state = { lista: [] };
     }
-    
+
     render() {
         return (
             <div>
