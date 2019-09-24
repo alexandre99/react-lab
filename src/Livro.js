@@ -12,9 +12,6 @@ class FormularioLivro extends Component {
         super();
         this.state = { titulo: '', preco: '', autorId: '', selectItems: [] };
         this.enviaForm = this.enviaForm.bind(this);
-        this.setTitulo = this.setTitulo.bind(this);
-        this.setPreco = this.setPreco.bind(this);
-        this.setAutorId = this.setAutorId.bind(this);
     }
 
     componentDidMount() {
@@ -54,25 +51,19 @@ class FormularioLivro extends Component {
         });
     }
 
-    setTitulo(evento) {
-        this.setState({ titulo: evento.target.value });
-    }
-
-    setPreco(evento) {
-        this.setState({ preco: evento.target.value });
-    }
-
-    setAutorId(evento) {
-        this.setState({ autorId: evento.target.value })
+    salvaAlteracao(nomeInput, evento) {
+        var campoSendoAlterado = {};
+        campoSendoAlterado[nomeInput] = evento.target.value;
+        this.setState(campoSendoAlterado);
     }
 
     render() {
         return (
             <div className="pure-form pure-form-aligned">
                 <form className="pure-form pure-form-aligned" onSubmit={this.enviaForm} method="post">
-                    <InputCustomizado id="titulo" type="text" name="titulo" value={this.state.titulo} onChange={this.setTitulo} label="Título" />
-                    <InputCustomizado id="preco" type="text" name="preco" value={this.state.preco} onChange={this.setPreco} label="Preço" />
-                    <SelectCustomizado value={this.state.autorId} name="autorId" onChange={this.setAutorId} label="Autor" selectItems={this.state.selectItems} />
+                    <InputCustomizado id="titulo" type="text" name="titulo" value={this.state.titulo} onChange={this.salvaAlteracao.bind(this, 'titulo')} label="Título" />
+                    <InputCustomizado id="preco" type="text" name="preco" value={this.state.preco} onChange={this.salvaAlteracao.bind(this, 'preco')} label="Preço" />
+                    <SelectCustomizado value={this.state.autorId} name="autorId" onChange={this.salvaAlteracao.bind(this, 'autorId')} label="Autor" selectItems={this.state.selectItems} />
                     <div className="pure-control-group">
                         <label></label>
                         <ButtonCustomizado type="submit" className="pure-button pure-button-primary" name="Gravar" />
