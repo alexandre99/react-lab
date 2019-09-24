@@ -19,6 +19,10 @@ export default class SelectCustomizado extends Component {
         }.bind(this));
     };
 
+    componentWillUnmount() {
+        PubSub.clearAllSubscriptions();
+    }
+
     render() {
         return (
             <div className="pure-control-group">

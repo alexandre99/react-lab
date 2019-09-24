@@ -136,6 +136,10 @@ export default class LivroBox extends Component {
         }.bind(this));
     }
 
+    componentWillUnmount() {
+        PubSub.clearAllSubscriptions();
+    }
+
     render() {
         return (
             <div>
