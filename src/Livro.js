@@ -2,16 +2,19 @@ import React, { Component } from 'react';
 import InputCustomizado from './componentes/InputCustomizado';
 import ButtonCustomizado from './componentes/ButtonCustomizado';
 import $ from 'jquery';
+import PubSub from 'pubsub-js';
+import TratadorErros from './TratadorErros';
 import SelectCustomizado, { SelectItem } from './componentes/SelectCustomizado';
 
 class FormularioLivro extends Component {
 
     constructor() {
         super();
-        this.state = { titulo: '', preco: '', idAutor: '', selectItems: [], selectValue: '' };
+        this.state = { titulo: '', preco: '', autorId: '', selectItems: [] };
+        this.enviaForm = this.enviaForm.bind(this);
         this.setTitulo = this.setTitulo.bind(this);
         this.setPreco = this.setPreco.bind(this);
-        this.setIdAutor = this.setIdAutor.bind(this);
+        this.setAutorId = this.setAutorId.bind(this);
     }
 
     componentDidMount() {
@@ -28,6 +31,29 @@ class FormularioLivro extends Component {
         });
     }
 
+    enviaForm(evento) {
+        evento.preventDefault();
+        $.ajax({
+            url: 'http://localhost:8080/api/livros',
+            contentType: 'application/json',
+            dataType: 'json',
+            type: 'post',
+            data: JSON.stringify({ titulo: this.state.titulo, preco: this.state.preco, autorId: this.state.autorId }),
+            success: function (novaLista) {
+                PubSub.publish('atualiza-lista-livros', novaLista);
+                this.setState({ titulo: '', preco: '', autorId: '' });
+            }.bind(this),
+            error: function (resposta) {
+                if (resposta.status === 400) {
+                    new TratadorErros().publicaErros(resposta.responseJSON);
+                }
+            },
+            beforeSend: function () {
+                PubSub.publish("limpa-erros", {});
+            }
+        });
+    }
+
     setTitulo(evento) {
         this.setState({ titulo: evento.target.value });
     }
@@ -36,8 +62,8 @@ class FormularioLivro extends Component {
         this.setState({ preco: evento.target.value });
     }
 
-    setIdAutor(evento) {
-        this.setState({ idAutor: evento.target.value })
+    setAutorId(evento) {
+        this.setState({ autorId: evento.target.value })
     }
 
     render() {
@@ -46,7 +72,7 @@ class FormularioLivro extends Component {
                 <form className="pure-form pure-form-aligned" onSubmit={this.enviaForm} method="post">
                     <InputCustomizado id="titulo" type="text" name="titulo" value={this.state.titulo} onChange={this.setTitulo} label="Título" />
                     <InputCustomizado id="preco" type="text" name="preco" value={this.state.preco} onChange={this.setPreco} label="Preço" />
-                    <SelectCustomizado value={this.state.value} name="autor" onChange={this.setIdAutor} label="autor" selectItems={this.state.selectItems} />
+                    <SelectCustomizado value={this.state.autorId} name="autorId" onChange={this.setAutorId} label="Autor" selectItems={this.state.selectItems} />
                     <div className="pure-control-group">
                         <label></label>
                         <ButtonCustomizado type="submit" className="pure-button pure-button-primary" name="Gravar" />
@@ -75,9 +101,9 @@ class TabelaLivro extends Component {
                             this.props.lista.map(function (livro) {
                                 return (
                                     <tr key={livro.id}>
-                                        <td>{livro.título}</td>
+                                        <td>{livro.titulo}</td>
                                         <td>{livro.preco}</td>
-                                        <td>{livro.autor}</td>
+                                        <td>{livro.autor.nome}</td>
                                     </tr>
                                 );
                             })
@@ -94,6 +120,20 @@ export default class LivroBox extends Component {
     constructor() {
         super();
         this.state = { lista: [] };
+    }
+
+    componentDidMount() {
+        $.ajax({
+            url: 'http://localhost:8080/api/livros',
+            dataType: 'json',
+            success: function (livros) {
+                this.setState({ lista: livros });
+            }.bind(this)
+        });
+
+        PubSub.subscribe('atualiza-lista-livros', function (topico, novaLista) {
+            this.setState({ lista: novaLista });
+        }.bind(this));
     }
 
     render() {

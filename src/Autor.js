@@ -108,8 +108,8 @@ export default class AutorBox extends Component {
         $.ajax({
             url: 'http://localhost:8080/api/autores',
             dataType: 'json',
-            success: function (resposta) {
-                this.setState({ lista: resposta });
+            success: function (autores) {
+                this.setState({ lista: autores });
             }.bind(this)
         });
 
