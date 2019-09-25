@@ -5,14 +5,21 @@ import './css/timeline.css'
 import './css/login.css'
 import App from './App';
 import Login from './componentes/Login';
-import { BrowserRouter, Route } from 'react-router-dom';
+import Logout from './componentes/Logout';
+import { Route, BrowserRouter as Router, Redirect } from 'react-router-dom'
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
-    <BrowserRouter>
-        <Route path="/" component={Login} />
-        <Route path="/timeline" component={App} />
-    </BrowserRouter>,
+    <Router>
+        <Route exact path='/' component={Login} />
+        <Route path='/timeline' render={() => (
+            localStorage.getItem('auth-token') == null ?
+                (<Redirect to={{ pathname: '/', state: {msg : 'Você precisa estar logado para acessar o endereço'} }} />)
+                : (<App />)
+        )
+        } />
+         <Route path="/logout" component={Logout}/>
+    </Router>,
     document.getElementById('root')
 );
 
