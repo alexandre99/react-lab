@@ -4,11 +4,12 @@ export default class Login extends Component {
 
     constructor(props) {
         super(props);
-        console.log(props)
-        if (this.props.location.state) {
-            console.log('teste');
-        }
-        this.state = { msg: ''};
+        this.state = { msg: this.getMsg()};
+    }
+
+    getMsg() {
+        let search = this.props.location.search;
+        return search ? search.substring(5) : '';
     }
 
     enviaForm(event) {
