@@ -26,7 +26,7 @@ class FotoInfo extends Component {
                 <div className="foto-info-likes">
                     {
                         this.props.foto.likers.map(liker => {
-                            return(<Link key={liker.login} href={`/timeline/${liker.login}`} >{liker.login},</Link>)
+                            return (<Link key={liker.login} href={`/timeline/${liker.login}`} >{liker.login},</Link>)
                         })
                     }
                     curtiram
@@ -55,10 +55,35 @@ class FotoInfo extends Component {
 }
 
 class FotoAtualizacoes extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = { likeada: this.props.foto.likeada };
+    }
+
+    like(event) {
+        event.preventDefault();
+
+        fetch(`http://localhost:8080/api/fotos/${this.props.foto.id}/like?X-AUTH-TOKEN=${localStorage.getItem('auth-token')}`, { method: 'POST' })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('não foi possível realizar o like da foto');
+                }
+            })
+            .then(() => {
+                this.setState({ likeada: !this.state.likeada })
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     render() {
         return (
             <section className="fotoAtualizacoes">
-                <a href="#" className="fotoAtualizacoes-like">Likar</a>
+                <a onClick={this.like.bind(this)} className={this.state.likeada ? 'fotoAtualizacoes-like-ativo' : 'fotoAtualizacoes-like'}>Linkar</a>
                 <form className="fotoAtualizacoes-form">
                     <input type="text" placeholder="Adicione um comentário..." className="fotoAtualizacoes-form-campo" />
                     <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit" />
@@ -76,7 +101,7 @@ export default class FotoItem extends Component {
                 <FotoHeader foto={this.props.foto} />
                 <img alt="foto" className="foto-src" src={this.props.foto.urlFoto} />
                 <FotoInfo foto={this.props.foto} />
-                <FotoAtualizacoes />
+                <FotoAtualizacoes foto={this.props.foto} />
             </div>
         );
     }
