@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import FotoItem from './Foto';
+import { TransitionGroup } from 'react-transition-group';
+import Pubsub from 'pubsub-js';
 
 export default class Timeline extends Component {
 
@@ -10,13 +12,16 @@ export default class Timeline extends Component {
     }
 
     componentDidMount() {
+        Pubsub.subscribe('timeline', (topico, fotos) => {
+            this.setState({ fotos });
+        });
         this.carregaFotos();
     }
 
     carregaFotos() {
         let urlPerfil = this.login ?
-                    `http://localhost:8080/api/public/fotos/${this.login}`
-                    : `http://localhost:8080/api/fotos?X-AUTH-TOKEN=${localStorage.getItem('auth-token')}`;
+            `http://localhost:8080/api/public/fotos/${this.login}`
+            : `http://localhost:8080/api/fotos?X-AUTH-TOKEN=${localStorage.getItem('auth-token')}`;
         fetch(urlPerfil)
             .then(response => response.json())
             .then(fotos => this.setState({ fotos: fotos }));
@@ -32,9 +37,14 @@ export default class Timeline extends Component {
     render() {
         return (
             <div className="fotos container">
-                {
-                    this.state.fotos.map(foto => <FotoItem key={foto.id} foto={foto} />)
-                }
+                <TransitionGroup
+                    transitionName="timeline"
+                    transitionEnterTimeout={500}
+                    transitionLeaveTimeout={300}>
+                    {
+                        this.state.fotos.map(foto => <FotoItem key={foto.id} foto={foto} />)
+                    }
+                </TransitionGroup>
             </div>
         );
     }
