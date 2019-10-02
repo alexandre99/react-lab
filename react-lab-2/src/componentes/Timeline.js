@@ -12,7 +12,7 @@ export default class Timeline extends Component {
     }
 
     componentDidMount() {
-        this.props.store.subscribe(() => this.setState({ fotos: this.props.store.getState() }));
+        this.props.store.subscribe(() => this.setState({ fotos: this.props.store.getState().timeline }));
         this.carregaFotos();
     }
 
