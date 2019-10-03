@@ -9,6 +9,14 @@ import Logout from './componentes/Logout';
 import { Route, BrowserRouter as Router, Redirect } from 'react-router-dom'
 import { matchPath } from 'react-router-dom'
 import * as serviceWorker from './serviceWorker';
+import thunkMiddleware from 'redux-thunk';
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
+import { timeline } from './reducers/timeline';
+import { notificacao } from './reducers/notificacao';
+
+const reducers = combineReducers({ timeline, notificacao });
+const store = createStore(reducers, applyMiddleware(thunkMiddleware));
 
 const isLoggedIn = (arg) => {
     console.log(arg);
@@ -25,16 +33,20 @@ const isLoggedIn = (arg) => {
 }
 
 ReactDOM.render(
-    <Router>
-        <Route exact path='/' component={Login} />
-        <Route path='/timeline/:login?' render={arg => (
-            isLoggedIn(arg) ?
-                (<App arg={arg}/>)
-                : (<Redirect to={{ pathname: '/', search: '?msg=Você precisa estar logado para acessar o endereço' }} />)
-        )
-        } />
-        <Route path="/logout" component={Logout} />
-    </Router>,
+    (
+        <Provider store={store}>
+            <Router>
+                <Route exact path='/' component={Login} />
+                <Route path='/timeline/:login?' render={arg => (
+                    isLoggedIn(arg) ?
+                        (<App arg={arg} />)
+                        : (<Redirect to={{ pathname: '/', search: '?msg=Você precisa estar logado para acessar o endereço' }} />)
+                )
+                } />
+                <Route path="/logout" component={Logout} />
+            </Router>
+        </Provider>
+    ),
     document.getElementById('root')
 );
 
